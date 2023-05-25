@@ -5,12 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session')
 const {v4:uuidv4} = require('uuid')
-const bodyParser = require('body-parser')
-var fileUpload = require('express-fileupload') 
-var fs = require('fs')
+
 
 var indexRouter = require('./routes/admin');
-var usersRouter = require('./routes/');
+var usersRouter = require('./routes');
 
 var app = express();
 

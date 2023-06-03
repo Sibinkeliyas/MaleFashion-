@@ -13,7 +13,11 @@ module.exports = {
      all_brands : () => {
         return new Promise(async(resolve,reject)=>{
             let brands = await connection.get().collection(collection.BRANDS).find().toArray()
-            resolve(brands)
+            if(brands) {
+                resolve(brands)
+            } else {
+                reject()
+            }
         })
         
     }

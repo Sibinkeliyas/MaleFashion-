@@ -6,42 +6,51 @@ module.exports = {
 
      doFindOrderedProduct : (productID,orderID) => {
         return new Promise(async(resolve,reject)=>{
-            let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
-           aggregate([
-            { 
-                $match: {  _id : ObjectID(orderID)}            
-            },
-            {
-                $unwind : '$products'
-            },
-            { 
-                $match: {  'products.item' : ObjectID(productID)}            
-            },
-            {
-                $lookup : 
-                {
-                    from : collection.PRODUCT_COLLECTION, 
-                    localField : 'products.item',
-                    foreignField : '_id',
-                    as:'orders'
-                }   
-            },{
-                $unwind : '$orders'
+            try {
+                let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
+                    aggregate([
+                        { 
+                            $match: {  _id : ObjectID(orderID)}            
+                        },
+                        {
+                            $unwind : '$products'
+                        },
+                        { 
+                            $match: {  'products.item' : ObjectID(productID)}            
+                        },
+                        {
+                            $lookup : 
+                            {
+                                from : collection.PRODUCT_COLLECTION, 
+                                localField : 'products.item',
+                                foreignField : '_id',
+                                as:'orders'
+                            }   
+                        },{
+                            $unwind : '$orders'
+                        }
+                    ]).toArray()
+                    resolve(orders)
+            } catch (err) {
+                reject(err)
             }
-        ]).toArray()
-        resolve(orders)
         })
     },
      doOrderCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-           let count = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).find({userID : ObjectID(userID)}).count()
+           try {
+            let count = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).find({userID : ObjectID(userID)}).count()
             resolve(count)
+           } catch (err) {
+            reject(err)
+           }
         })
     },
     
     docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
+            try {
+                let count = 0
             let cart = await connection.get().collection(collection.CART).findOne({
                 userId :ObjectID (userID)})
             if(cart){
@@ -50,18 +59,26 @@ module.exports = {
             }else{
                 resolve(0)
             }
+            } catch (err) {
+                reject(err)
+            }
         })
     },
     doOrderDetails : (userID) => {
         return new Promise(async(resolve,reject)=>{
-        let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
+        try {
+            let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
         find({userID : ObjectID(userID)}).sort({arragingdate : -1}).toArray()
         resolve(orders)
+        } catch (err) {
+            reject(err)
+        }
         })
     },
      doFindorderQuantity : (orderID) => {
         return new Promise(async(resolve,reject) => {
-            let orders = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION)
+            try {
+                let orders = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION)
             .aggregate([
                     {
                         $match : 
@@ -82,14 +99,21 @@ module.exports = {
                 }
                 ]).toArray()
                     resolve(orders)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      paymentMethod : (orderID) => {
         return new Promise(async(resolve,reject) => {
-            let orderStatus = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).findOne({
+            try {
+                let orderStatus = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).findOne({
                 _id : ObjectID(orderID)
             })
-            resolve(orderStatus)
+                resolve(orderStatus)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      updateOrder : (orderID,productsQuantity,status) => {
@@ -104,13 +128,16 @@ module.exports = {
         }).then((data)=>{
             quantityIncreasing(productsQuantity)
             resolve(data)
+        }).catch(err => {
+            reject(err)
         })
            
     })
     },
      totalAmount : (orderID) => {
         return new Promise(async(resolve,reject) => {
-            let total = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).aggregate(
+            try {
+                let total = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).aggregate(
                     [
                         {
                             $match :
@@ -128,6 +155,9 @@ module.exports = {
                     ]
             ).toArray()
             resolve(total)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
     addTowallet : (amount,userID) => {
@@ -163,12 +193,14 @@ module.exports = {
                    }
                ).then((data) => {
                 resolve(data)
+               }).catch((err) => {
+                resolve(reject)
                })
            }else{
                connection.get().collection(collection.WALLET).insertOne(wallets).then((data) => {
                    resolve(data)
-           }).then((data) => {
-            resolve(data)
+           }).catch((err) => {
+            reject(err)
            })
        }
    

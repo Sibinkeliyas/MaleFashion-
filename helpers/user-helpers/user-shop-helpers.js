@@ -7,7 +7,8 @@ module.exports = {
 
      docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
+            try {
+                let count = 0
             let cart = await connection.get().collection(collection.CART).findOne({
                 userId :ObjectID (userID)})
             if(cart){
@@ -16,33 +17,47 @@ module.exports = {
             }else{
                 resolve(0)
             }
+            } catch (err) {
+                reject(err)
+            }
         })
     },
     
     doFindCategory : () => {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.CATEGORIES).find().toArray((err,data)=>{
-                resolve(data)
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(data)
+                }
             })
         })
 
     },
     doFindAllproduct : (fileterMax,fileterMin) => {
         return new Promise(async(resolve,reject)=>{
-        let data = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
-        
-        }).toArray()
+        try {
+            let data = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
+            }).toArray()
         resolve(data)
+        } catch (err) {
+            reject(err)
+        }
         })
     },
      fileterMaxFind : (priceproduct) => {
         let max = parseInt(priceproduct.max)
         let min = parseInt(priceproduct.min)
         return new Promise(async(resolve,reject) => {
-          let price = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
+          try {
+            let price = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
             price : {$gte : min, $lte : max }
           }).toArray()             
           resolve(price)
+          } catch (err) {
+            reject(err)
+          }
         })
     }
     

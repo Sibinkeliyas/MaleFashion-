@@ -9,14 +9,22 @@ module.exports = {
   doFindCategory : () => {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.CATEGORIES).find().toArray((err,data)=>{
-                resolve(data)
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(data)
+                }
             })
         })
     },
      doFindSingleCategory : (categoryID) => {
         return new Promise(async(resolve,reject)=>{
-            let user = await connection.get().collection(collection.CATEGORIES).findOne({_id :ObjectID(categoryID)})
-            resolve(user)
+            try {
+                let user = await connection.get().collection(collection.CATEGORIES).findOne({_id :ObjectID(categoryID)})
+                    resolve(user)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      findCoupen : (coupen) => {
@@ -26,12 +34,18 @@ module.exports = {
             }
             ).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
      doAdd : (productData) => {
         return new Promise(async(resolve,reject)=>{     
-            connection.get().collection(collection.PRODUCT_COLLECTION).insertOne(productData)
+            connection.get().collection(collection.PRODUCT_COLLECTION).insertOne(productData).then((data) => {
+                resolve(data)
+            }).catch((err) => {
+                reject(err)
+            })
         })
     }
     

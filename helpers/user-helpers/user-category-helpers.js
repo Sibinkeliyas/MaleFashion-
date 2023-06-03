@@ -7,23 +7,31 @@ module.exports = {
 
      docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
-            let cart = await connection.get().collection(collection.CART).findOne({
-                userId :ObjectID (userID)})
-            if(cart){
-                count = cart.products.length
-                resolve(count)
-            }else{
-                resolve(0)
+            try {
+                let count = 0
+                    let cart = await connection.get().collection(collection.CART).findOne({
+                        userId :ObjectID (userID)})
+                    if(cart){
+                        count = cart.products.length
+                        resolve(count)
+                    }else{
+                        resolve(0)
+                    }
+            } catch (err) {
+                reject(err)
             }
         })
     },
      doFindCategoryItems : (categoryID) => {
         return new Promise(async(resolve,reject)=>{
-            let category = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
+           try {
+             let category = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
                 categoryId : ObjectID(categoryID)
             }).toArray()
-            resolve(category)
+                resolve(category)
+           } catch (err) {
+                reject(err)
+           }
         })
     },
     doFindCategory : (categoryID) => {
@@ -32,6 +40,8 @@ module.exports = {
                 _id : ObjectID(categoryID)
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })           
         })
     }

@@ -17,6 +17,8 @@ module.exports = {
                 coupenName : coupen.coupenName
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -27,9 +29,11 @@ module.exports = {
         }
         coupen.userID = [userID]
         return new Promise(async(resolve,reject) => {
-            connection.get().collection(collection.COUPENS).insertOne(coupen)
-        }).then((data) => {
-           
+            connection.get().collection(collection.COUPENS).insertOne(coupen).then((data) => {
+           resolve(data)
+        }).catch((err) => {
+            reject(err)
+        })
         })
     },
     deleteCoupen : (id) => {
@@ -38,6 +42,8 @@ module.exports = {
                 _id : ObjectID(id)
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     }

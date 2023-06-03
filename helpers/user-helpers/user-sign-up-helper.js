@@ -16,7 +16,7 @@ module.exports = {
         if(!user){            
         //password bcrypt
         bcrypt.hash(userData.password, 10, (err, hash)=> {
-        if(err) throw err
+        if(err) reject(err)
         else{                  
         userData.password = hash                   
         }
@@ -26,6 +26,8 @@ module.exports = {
          userData.arragingdate = moment().format()            
         connection.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>{
         resolve(data.insertedId)
+        }).catch((err) => {
+          reject(err)
         })
         });          
         }else{
@@ -42,6 +44,8 @@ module.exports = {
         {refferralCode : refferal}
       ).then((data) => {
         resolve(data)
+      }).catch((err) => {
+        reject(err)
       })
     })
   },
@@ -66,10 +70,14 @@ module.exports = {
             $push : { wallet :  Wallet}
           }).then((data) => {
             resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         }else{
           connection.get().collection(collection.WALLET).insertOne(wallets).then((data) => {
             resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         }
 

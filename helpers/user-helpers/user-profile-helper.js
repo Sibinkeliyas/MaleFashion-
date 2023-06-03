@@ -10,6 +10,8 @@ module.exports = {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.ADDRESS_COLLECTION).findOne({userID : ObjectID(userID)}).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -22,6 +24,8 @@ module.exports = {
                     {$push : {userAddress : address}}
             ).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
           }else{
            let userAddress = {
@@ -42,6 +46,8 @@ module.exports = {
             }
             connection.get().collection(collection.ADDRESS_COLLECTION).insertOne(useraAdress).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
           }
         })
@@ -66,6 +72,8 @@ module.exports = {
                 }
             ]).toArray().then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -79,6 +87,8 @@ module.exports = {
                 }
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -91,6 +101,8 @@ module.exports = {
                 $set : {"userAddress.$.addressStatus" : true}
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -102,6 +114,8 @@ module.exports = {
                 }
                 ]).toArray().then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     }
@@ -115,6 +129,8 @@ function changeDefaultAddress(userID){
             $set : {"userAddress.$.addressStatus" : false}
         }).then((data) => {
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
 }

@@ -8,7 +8,11 @@ module.exports = {
     doFindCategory : () => {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.CATEGORIES).find().toArray((err,data)=>{
-                resolve(data)
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(data)
+                }
             })
         })
     
@@ -32,31 +36,51 @@ module.exports = {
                categories : item 
             })
           
-                resolve(category)
+                if(category) {
+                    resolve(category)
+                } else {
+                    reject()
+                }
         })
     },
      doUpdateCategory : (categoryID,category) => {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.CATEGORIES).updateOne({_id : categoryID},
-               {$set : { category : category }})
+               {$set : { category : category }}).then((data) => {
+            resolve(data)
+          }).catch((err) => {
+            reject(err)
+          })
         })
     },
     doDeleteCategory : (categoryID) => {
         return new Promise(async(resolve,reject)=>{
-            connection.get().collection(collection.CATEGORIES).deleteOne({_id :ObjectID(categoryID)})
+            connection.get().collection(collection.CATEGORIES).deleteOne({_id :ObjectID(categoryID)}).then((data) => {
+            resolve(data)
+          }).catch((err) => {
+            reject(err)
+          })
         })
     
     },
     all_category_coupen : () => {
         return new Promise(async(resolve,reject) => {
            let coupen = await connection.get().collection(collection.CATEGORY_COUPEN).find().toArray()
-           resolve(coupen)
+           if(coupen) {
+            resolve(coupen)
+           } else {
+            reject()
+           }
         })
     },
      categories : () => {
         return new Promise(async(resolve,reject) => {
             let category = await connection.get().collection(collection.CATEGORIES).find().toArray()
-            resolve(category)
+            if(category) {
+                resolve(category)
+            } else {
+                reject()
+            }
         })
     },
     findCoupen : (coupen) => {
@@ -65,12 +89,18 @@ module.exports = {
                 category : coupen.category
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
      coupen  : (coupen) => {
         return new  Promise(async(resolve,reject) => {
-            connection.get().collection(collection.CATEGORY_COUPEN).insertOne(coupen)
+            connection.get().collection(collection.CATEGORY_COUPEN).insertOne(coupen).then((data) => {
+            resolve(data)
+          }).catch((err) => {
+            reject(err)
+          })
         })
     },
     
@@ -102,6 +132,8 @@ module.exports = {
                 _id : ObjectID(category.id)
             }).then((data) => {
                 removeCategoryOffer(category.item)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },

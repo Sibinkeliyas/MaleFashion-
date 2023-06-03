@@ -9,7 +9,8 @@ module.exports = {
 
       doFindCartItem : (userID) => {
         return new Promise(async(resolve,reject)=>{
-          let cart = await connection.get().collection(collection.CART).
+          try {
+            let cart = await connection.get().collection(collection.CART).
            aggregate([
                     { 
                         $match: {  userId : ObjectID(userID)}            
@@ -40,6 +41,9 @@ module.exports = {
                   
               ]).toArray()
             resolve(cart)
+          } catch (err) {
+            reject(err)
+          }
         })
     },
      doTotalAmount : (userID) => {
@@ -91,6 +95,8 @@ module.exports = {
                  
                 }
                  resolve(amount)
+               }).catch((err) => {
+                reject(err)
                })
              
          })
@@ -98,7 +104,8 @@ module.exports = {
         },
          paymentAddress : (addresID,user) => {
             return new Promise(async(resolve,reject)=>{
-                let address =await connection.get().collection(collection.ADDRESS_COLLECTION).aggregate([
+              try {
+                  let address =await connection.get().collection(collection.ADDRESS_COLLECTION).aggregate([
                     {
                         $match : 
                         {
@@ -119,13 +126,20 @@ module.exports = {
                     },
                 ]).toArray()
                 resolve(address[0])
+              } catch (err) {
+                reject(err)
+              }
             })
         },
          findpaymentAddress : (addresID,userID) => {
             return new Promise(async(resolve,reject)=>{
-               let address = await connection.get().collection(collection.ADDRESS_COLLECTION).
-                findOne({userID: ObjectID(userID),'userAddress._id' :ObjectID(addresID)})
-                resolve(address)
+              try {
+                 let address = await connection.get().collection(collection.ADDRESS_COLLECTION).
+                    findOne({userID: ObjectID(userID),'userAddress._id' :ObjectID(addresID)})
+                        resolve(address)
+              } catch (err) {
+                reject(err)
+              }
             })
         },
         
@@ -133,12 +147,15 @@ module.exports = {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.ADDRESS_COLLECTION).findOne({userID : ObjectID(userID)}).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
      docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
+            try {
+                let count = 0
             let cart = await connection.get().collection(collection.CART).findOne({
                 userId :ObjectID (userID)})
             if(cart){
@@ -146,6 +163,9 @@ module.exports = {
                 resolve(count)
             }else{
                 resolve(0)
+            }
+            } catch (err) {
+                reject(err)
             }
         })
     },
@@ -168,13 +188,16 @@ module.exports = {
                 }
             ]).toArray().then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
     
      getCartList : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let cart = await connection.get().collection(collection.CART).aggregate([
+            try {
+                let cart = await connection.get().collection(collection.CART).aggregate([
                 {
                     $match : 
                     {
@@ -203,32 +226,39 @@ module.exports = {
                     $project : {products : 1,quantity : 1}
                 }
             ]).toArray()
-            resolve(cart)
+                resolve(cart)
+            } catch (error) {
+                reject(err)
+            }
         })
     },
      getCartquantity : (userID) => {
         return new Promise(async(resolve,reject)=>{
-           let quantity = await connection.get().collection(collection.CART).
-           aggregate([
-            {
-                $match : 
+           try {
+            let quantity = await connection.get().collection(collection.CART).
+            aggregate([
                 {
-                    userId : ObjectID(userID)
+                    $match : 
+                    {
+                        userId : ObjectID(userID)
+                    }
+                },{
+                    $unwind : '$products'
+                },{
+                    $project :{quantity : '$products.quantity',item : '$products.item'}
+                },{
+                    $unwind : '$quantity'
                 }
-            },{
-                $unwind : '$products'
-            },{
-                $project :{quantity : '$products.quantity',item : '$products.item'}
-            },{
-                $unwind : '$quantity'
-            }
            ]).toArray()
-         
             resolve(quantity)
+           } catch (err) {
+            reject(err)
+           }
         })
     },
      placeOrder : (order,products,totalPrize,productsQuantity,userID) => {
-        for(i=0;i< products.length ; i++){
+        try {
+            for(i=0;i< products.length ; i++){
             products[i].products.itemquantity = productsQuantity[i].quantity
         }
         let total = {
@@ -262,6 +292,8 @@ module.exports = {
         }
         connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).insertOne(orderObj).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
         
         // ....................quantity decreasing...........................//
@@ -276,14 +308,20 @@ module.exports = {
             userId : ObjectID(order.userID)})
           
         })
+        } catch (err) {
+            reject(err)
+        }
 
     },   
      doViewItem : (productID) => {
         return new Promise(async(resolve,reject)=>{
-        
-        let product =  await connection.get().collection(collection.PRODUCT_COLLECTION).findOne({_id : productID})
-          resolve(product)
-        })
+            try {
+                let product =  await connection.get().collection(collection.PRODUCT_COLLECTION).findOne({_id : productID})
+                    resolve(product)
+            } catch (err) {
+                reject(err)
+            }
+            })
     },
      SingleplaceOrder : (order,products,totalPrice,productsQuantity) => {
      
@@ -306,6 +344,8 @@ module.exports = {
          }
          connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).insertOne(orderObj).then((data)=>{
              resolve(data)
+         }).catch((err) => {
+            reject(err)
          })
          
            
@@ -318,8 +358,12 @@ module.exports = {
 
      doFindproduct : (productID) => {
         return new Promise(async(resolve,reject)=>{
-           let user = await connection.get().collection(collection.PRODUCT_COLLECTION).findOne({_id : productID})
-           resolve(user)
+           try {
+            let user = await connection.get().collection(collection.PRODUCT_COLLECTION).findOne({_id : productID})
+                resolve(user)
+           } catch (err) {
+            reject(err)
+           }
            
         })
     },
@@ -375,6 +419,8 @@ module.exports = {
                 
                 }
                 resolve(amount)
+                }).catch((err) => {
+                    reject(err)
                 })
             
         })
@@ -384,13 +430,17 @@ module.exports = {
 }
 
 function quantitydecrease  (productsQuantity) {
-    for(i = 0 ; i  < productsQuantity.length ; i ++){
+    try {
+        for(i = 0 ; i  < productsQuantity.length ; i ++){
          connection.get().collection(collection.PRODUCT_COLLECTION).updateOne({
             _id : productsQuantity[i].item
         },
         {
             $inc : {'quantity' : -productsQuantity[i].quantity}
         })
+    }
+    } catch (err) {
+        
     }
 }
 
@@ -404,6 +454,10 @@ function addUser  (userID,coupen) {
             coupenName : coupen
         },{
             $push : {userID :userIDs}
+        }).then((data) => {
+            resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
 }

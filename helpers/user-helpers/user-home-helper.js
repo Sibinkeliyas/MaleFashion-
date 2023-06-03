@@ -2,6 +2,7 @@ const connection = require('../../config/connection')
 const collection = require('../../config/collection')
 const { ObjectID } = require('bson');
 const moment = require('moment');
+const { reject } = require('promise');
 
 module.exports = {
 
@@ -20,12 +21,15 @@ module.exports = {
                     }
                 ]).toArray().then((data) => {
                     resolve(data)
+                }).catch((err) => {
+                    reject(err)
                 })
         })
     },
      walletFind : (userID) => {
         return new Promise(async(resolve,reject) => {
-            let wallet = await connection.get().collection(collection.WALLET).aggregate([
+            try {
+                let wallet = await connection.get().collection(collection.WALLET).aggregate([
             {
               $match :
                 {
@@ -37,11 +41,15 @@ module.exports = {
             }
             ]).toArray()
             resolve(wallet)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
+            try {
+                let count = 0
             let cart = await connection.get().collection(collection.CART).findOne({
                 userId :ObjectID (userID)})
             if(cart){
@@ -50,25 +58,36 @@ module.exports = {
             }else{
                 resolve(0)
             }
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      doFindBanners : () => {
         return new Promise(async(resolve,reject) => {
-            let banner = await connection.get().collection(collection.BANNERS).aggregate([
+            try {
+                let banner = await connection.get().collection(collection.BANNERS).aggregate([
              
                 {
                     $unwind : '$images'
                 }
             ]).toArray()
             resolve(banner)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      doFindAllproduct : () => {
         return new Promise(async(resolve,reject)=>{
-         let data = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
-            date : {$gte :moment().subtract(7, 'days').calendar()}
-         }).toArray()
-         resolve(data)
+            try {
+                   let data = await connection.get().collection(collection.PRODUCT_COLLECTION).find({
+                        date : {$gte :moment().subtract(7, 'days').calendar()}
+                    }).toArray()
+                    resolve(data)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
      doFindSingleWishList : (userID) => {
@@ -97,6 +116,8 @@ module.exports = {
             productName :  { $regex: '.*'+search+'.*', $options: 'i' }
           }).toArray().then((data) => {
               resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
        })
         

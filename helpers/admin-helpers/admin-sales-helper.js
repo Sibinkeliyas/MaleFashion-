@@ -6,7 +6,8 @@ module.exports = {
 
      orders : () => {
         return new Promise(async(resolve,reject) => {
-            let order = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).aggregate([
+            try {
+                let order = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).aggregate([
                 {
                     $lookup : {
                         from : collection.USER_COLLECTION,
@@ -18,14 +19,21 @@ module.exports = {
                     $unwind : '$user'
                 }
             ]).toArray()
-            resolve(order)
+                resolve(order)
+            } catch (err) {
+                reject(err)
+            }
         })
     },
     
     all_orders : () => {
         return new Promise(async(resolve,reject) => {
-            let orders = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).find().toArray()
-            resolve(orders)
+            try {
+                let orders = await connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).find().toArray()
+                    resolve(orders)
+            } catch (err) {
+                reject(err)
+            }
         })
     }
         

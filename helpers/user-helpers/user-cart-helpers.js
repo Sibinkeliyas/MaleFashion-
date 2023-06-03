@@ -19,12 +19,20 @@ module.exports = {
                     },{
                         $inc : {'products.$.quantity' :1}
                     }
-                    )
+                    ).then((data) => {
+                        resolve(data)
+                    }).catch((err) => {
+                        reject(err)
+                    })
                }else{
                 connection.get().collection(collection.CART).updateOne({userId :ObjectID(userID)},
                     {$push : 
                         {products : productObject }
-                    })
+                    }).then((data) => {
+                            resolve(data)
+                        }).catch((err) => {
+                            reject(err)
+                        })
                 }
             }else{
                
@@ -34,6 +42,8 @@ module.exports = {
                 }
                 connection.get().collection(collection.CART).insertOne(userCart).then((data)=>{
                     resolve(data)
+                }).catch((err) => {
+                    reject((err))
                 })
             }
         })
@@ -41,7 +51,8 @@ module.exports = {
     },
      docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
+           try {
+             let count = 0
             let cart = await connection.get().collection(collection.CART).findOne({
                 userId :ObjectID (userID)})
             if(cart){
@@ -50,6 +61,9 @@ module.exports = {
             }else{
                 resolve(0)
             }
+           } catch (err) {
+            reject(err)
+           }
         })
     },
     
@@ -105,6 +119,8 @@ module.exports = {
                 
                 }
                 resolve(amount)
+                }).catch((err) => {
+                    reject(err)
                 })
             
         })
@@ -112,7 +128,8 @@ module.exports = {
         },
           doFindCartItem : (userID) => {
             return new Promise(async(resolve,reject)=>{
-              let cart = await connection.get().collection(collection.CART).
+              try {
+                let cart = await connection.get().collection(collection.CART).
                aggregate([
                         { 
                             $match: {  userId : ObjectID(userID)}            
@@ -143,6 +160,9 @@ module.exports = {
                       
                   ]).toArray()
                 resolve(cart)
+              } catch (err) {
+                reject(err)
+              }
             })
         },
          checkingCoupen : (coupen) => {
@@ -151,6 +171,8 @@ module.exports = {
                     coupenName : coupen
                 }).then((data) => {
                   resolve(data)
+                }).catch((err) => {
+                    reject(err)
                 })
             })
         },
@@ -177,6 +199,8 @@ module.exports = {
                
             ]).toArray().then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -185,7 +209,9 @@ module.exports = {
             connection.get().collection(collection.CART).updateOne({'products.item' : cartID,userId: ObjectID(userID)},{
                 $set : {'products.$.quantity' :quantity}
             }).then((data)=>{
-            
+                resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -196,7 +222,9 @@ module.exports = {
             connection.get().collection(collection.CART).updateOne({'products.item' : cartID,userId: ObjectID(userID)},{
                 $set : {'products.$.quantity' :quantity}
             }).then((data)=>{
-                
+                resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -206,6 +234,8 @@ module.exports = {
                 $pull : { products: {item : ObjectID(cartID)} }
             }).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
        
         })

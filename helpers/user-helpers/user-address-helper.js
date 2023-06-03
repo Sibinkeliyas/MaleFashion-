@@ -9,14 +9,18 @@ module.exports = {
     
     docartProductCount : (userID) => {
         return new Promise(async(resolve,reject)=>{
-            let count = 0
-            let cart = await connection.get().collection(collection.CART).findOne({
-                userId :ObjectID (userID)})
-            if(cart){
-                count = cart.products.length
-                resolve(count)
-            }else{
-                resolve(0)
+            try {
+                let count = 0
+                    let cart = await connection.get().collection(collection.CART).findOne({
+                        userId :ObjectID (userID)})
+                    if(cart){
+                        count = cart.products.length
+                        resolve(count)
+                    }else{
+                        resolve(0)
+                    }
+            } catch (err) {
+                reject(err)
             }
         })
     },
@@ -30,6 +34,8 @@ module.exports = {
                     {$push : {userAddress : address}}
             ).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
           }else{
            let userAddress = {
@@ -52,6 +58,8 @@ module.exports = {
             }
             connection.get().collection(collection.ADDRESS_COLLECTION).insertOne(useraAdress).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
           }
         })
@@ -60,6 +68,8 @@ module.exports = {
         return new Promise(async(resolve,reject)=>{
             connection.get().collection(collection.ADDRESS_COLLECTION).findOne({userID : ObjectID(userID)}).then((data)=>{
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -74,11 +84,15 @@ module.exports = {
                     $pull : { userAddress: {_id : ObjectID(addresID)} }
                 }).then((data)=>{
                     resolve(data)
+                }).catch((err) => {
+                    reject(err)
                 })
            
             }
         
         
+        }).catch((err) => {
+            reject(err)
         })
        
        })
@@ -96,6 +110,8 @@ module.exports = {
             }
             ).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
    
@@ -123,6 +139,8 @@ function findAddressStatus(addresID,userID) {
             }
         ]).toArray().then((data) => {
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
 }

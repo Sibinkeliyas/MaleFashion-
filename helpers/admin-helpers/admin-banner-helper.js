@@ -15,6 +15,8 @@ module.exports = {
             }
           ]).toArray().then((data) => {
             resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         })
       },
@@ -32,6 +34,8 @@ module.exports = {
             }
           ]).toArray().then((data) => {
             resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         })
       },
@@ -46,6 +50,10 @@ module.exports = {
               images : details.images
             }
            
+          }).then((data) => {
+            resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         })
       },
@@ -55,6 +63,8 @@ module.exports = {
             _id : ObjectID(bannerID)
           }).then((data) => {
             resolve(data)
+          }).catch((err) => {
+            reject(err)
           })
         })
       }

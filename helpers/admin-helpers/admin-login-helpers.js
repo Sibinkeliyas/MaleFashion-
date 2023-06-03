@@ -11,7 +11,6 @@ module.exports = {
                 connection.get().collection(collection.ADMIN_LOGIN).insertOne(adminData).then((data) => {
                     resolve(data)
                 }).catch((err) => {
-                    console.log(err);
                     reject(err)
                 })
             } else {
@@ -22,23 +21,23 @@ module.exports = {
 
      admin_login : (adminData) => {
         return new Promise(async(resolve,reject)=>{
-            let response = {}
+            try {
+                let response = {}
             let user =await connection.get().collection(collection.ADMIN_LOGIN).findOne({email:adminData.email})
-            if(user){
-                
-            if(user.password == adminData.password){
-            
-            response.admin = user   
-            response.status = true 
-            resolve(response)
+            if(user){ 
+                if(user.password == adminData.password){
+                    response.admin = user   
+                    response.status = true 
+                    resolve(response)
+                }else{
+                    resolve({status : false})
+                }
             }else{
-                   
-            resolve({status : false})
+                resolve({emailStatus : true})
             }
-            }else{
-            resolve({emailStatus : true})
+            } catch (err) {
+                reject(err)
             }
-            
         })
     }
 

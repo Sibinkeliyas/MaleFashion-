@@ -11,7 +11,11 @@ module.exports = {
             {_id : ObjectID(orderID)},{
               $set : {status : status}
             }
-          )
+          ).then((data) => {
+                            resolve(data)
+                        }).catch((err) => {
+                            reject(err)
+                        })
         })
       },
        increase : (productsQuantity) => {
@@ -22,7 +26,11 @@ module.exports = {
                },
                {
                    $inc : {'quantity' : productsQuantity[i].quantity}
-               })
+               }).then((data) => {
+                            resolve(data)
+                        }).catch((err) => {
+                            reject(err)
+                        })
            }
         })
       }

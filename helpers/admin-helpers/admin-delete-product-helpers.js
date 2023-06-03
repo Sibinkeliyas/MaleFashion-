@@ -7,7 +7,11 @@ module.exports = {
 
      doDelete : (productID) => {
         return new Promise(async(resolve,reject)=>{
-            connection.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id : productID})
+            connection.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id : productID}).then((data) => {
+                resolve(data)
+            }).catch((err) => {
+                reject(err)
+            })
         })
     }
 

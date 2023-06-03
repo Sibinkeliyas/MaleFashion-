@@ -7,7 +7,8 @@ module.exports = {
 
      doLogin : (userData) => {
         return new Promise(async(resolve,reject)=>{
-            let user = await connection.get().collection(collection.USER_COLLECTION).findOne({email : userData.email})
+            try {
+              let user = await connection.get().collection(collection.USER_COLLECTION).findOne({email : userData.email})
             if(user){
                 if(user.loginStatus){
                       bcrypt.compare(userData.password, user.password, function(err, result) {
@@ -28,13 +29,20 @@ module.exports = {
                         resolve({emailstatus : true})
                       }
                    
+            } catch (err) {
+              reject(err)
+            }
         })
     },
      doFindNumber : (userNumber) => {
         
         return new Promise(async(resolve,reject)=>{
-          let user = await connection.get().collection(collection.USER_COLLECTION).findOne({mobile : userNumber})        
-          resolve(user)
+          try {
+            let user = await connection.get().collection(collection.USER_COLLECTION).findOne({mobile : userNumber})        
+              resolve(user)
+          } catch (err) {
+            reject(err)
+          }
         })
       },
       updatePassword : (mobile,password) => {
@@ -47,6 +55,8 @@ module.exports = {
                 }
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+              reject(err)
             })
         })
     }

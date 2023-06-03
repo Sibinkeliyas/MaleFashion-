@@ -7,35 +7,42 @@ module.exports = {
 
       allOrders : () => {
         return new Promise(async(resolve,reject)=>{
-        let  all_orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION)
-        .aggregate([
-            {
-                $lookup : 
-                {
-                    from : collection.USER_COLLECTION,
-                    localField : "userID",
-                    foreignField : '_id',
-                    as :'user'
-                }
-            },
-            {
-                $unwind : '$user'
+            try {
+                let  all_orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION)
+                    .aggregate([
+                        {
+                            $lookup : 
+                            {
+                                from : collection.USER_COLLECTION,
+                                localField : "userID",
+                                foreignField : '_id',
+                                as :'user'
+                            }
+                        },
+                        {
+                            $unwind : '$user'
+                        }
+                    ]).toArray()
+                        resolve(all_orders)
+            } catch (err) {
+                reject((err))
             }
-        ]).toArray()
-        resolve(all_orders)
-            
         })
     },
      doOrderDetails : (orderID) => {
         return new Promise(async(resolve,reject)=>{
-         let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
-           aggregate([
-            { 
-                $match: {  _id : ObjectID(orderID)}            
-            },
-           
-           ]).toArray()
-           resolve(orders)
+         try {
+            let orders = await  connection.get().collection(collection.ORDER_PAYMENT_COLLECTION).
+                aggregate([
+                    { 
+                        $match: {  _id : ObjectID(orderID)}            
+                    },
+                
+                ]).toArray()
+                resolve(orders)
+         } catch (err) {
+            reject((err))
+         }
         })
     } ,
     
@@ -49,6 +56,8 @@ module.exports = {
             }
         }).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
     },
@@ -62,6 +71,8 @@ module.exports = {
             }
         }).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
     },
@@ -77,6 +88,8 @@ module.exports = {
             }
         }).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
     },
@@ -91,6 +104,8 @@ module.exports = {
             }
         }).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+            reject(err)
         })
     })
     }

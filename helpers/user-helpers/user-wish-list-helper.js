@@ -26,6 +26,8 @@ module.exports = {
                         {products : productObject }
                     }).then((data) => {
                         resolve({status : "add"})
+                    }).catch((err) => {
+                        reject(err)
                     })
                 }
                 
@@ -37,6 +39,8 @@ module.exports = {
                 }
                 connection.get().collection(collection.WISH_LIST).insertOne(userwishlist).then((data)=>{
                     resolve({status : "add"})
+                }).catch((err) => {
+                    reject(err)
                 })
             }
         })
@@ -44,7 +48,8 @@ module.exports = {
     },
       doFindWishList : (userID) => {
         return new Promise(async(resolve,reject)=>{
-          let wishlist = await connection.get().collection(collection.WISH_LIST).
+          try {
+            let wishlist = await connection.get().collection(collection.WISH_LIST).
            aggregate([
                     { 
                         $match: {  userID : ObjectID(userID)}            
@@ -74,6 +79,9 @@ module.exports = {
                   
               ]).toArray()
             resolve(wishlist)
+          } catch (err) {
+            reject(err)
+          }
         })
     },
     deleteWishList : (userID,productID) => {
@@ -83,6 +91,10 @@ module.exports = {
             },
             {
                 $pull : { products: {item : ObjectID(productID)} }
+            }).then((data) => {
+                resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     },
@@ -101,6 +113,8 @@ let status
                     connection.get().collection(collection.WISH_LIST).updateOne({userID :ObjectID(userID),'products.item' : ObjectID(productID)},
                     {$pull : { products: {item : ObjectID(productID)}}}).then((data) => {
                         resolve({status : "delete"})
+                    }).catch((err) => {
+                        reject(err)
                     })
                 }else {
                     
@@ -109,6 +123,8 @@ let status
                         {products : productObject }
                     }).then((data) => {
                         resolve({status : "add"})
+                    }).catch((err) => {
+                        reject(err)
                     })
                 }
                 

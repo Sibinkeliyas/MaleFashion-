@@ -13,6 +13,8 @@ module.exports = {
                 _id : ObjectID(orderID)
             }).then((data) => {
                 resolve(data)
+            }).catch((err) => {
+                reject(err)
             })
         })
     }

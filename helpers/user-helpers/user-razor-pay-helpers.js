@@ -17,7 +17,8 @@ module.exports = {
 
       generateRazorPay : (orderID,total) => { 
         return new Promise(async(resolve,reject)=>{
-          var options = {
+          try {
+            var options = {
             amount: parseInt(total),
             currency : "INR",
             receipt : orderID
@@ -25,28 +26,24 @@ module.exports = {
           instance.orders.create(options,function(err,order){
             resolve(order)
           })
+          } catch (err) {
+            reject(err)
+          }
          })
         
   },
   
         verify_payment : (details) => {
             return new Promise(async(resolve,reject)=>{
-        
             let hmac =crypto.createHmac('sha256', 'm4m3ubcolZTkmIMQNv7v8PEe');
-        
-        
             hmac.update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]']);
-        
             //.......to convert into hex....//
-        
             hmac=hmac.digest('hex')
-        
             //------------
-        
             if(hmac == details['payment[razorpay_signature]']){
-            resolve("data")
+              resolve("data")
             }else{
-            reject()
+              reject()
             }
             })
         },
@@ -58,6 +55,8 @@ module.exports = {
                 }
               ).then((data) => {
                 resolve(data)
+              }).catch((err) => {
+                reject(err)
               })
             })
           },
@@ -67,8 +66,12 @@ module.exports = {
                 {_id : ObjectID(orderID)},{
                   $set : {status : 'failed'}
                 }
-              )
-              quantityIncreasing(productsQuantity)
+              ).then((data) => {
+                quantityIncreasing(productsQuantity)
+              }).catch((err) => {
+                reject(err)
+              })
+              
             })
           }
           
@@ -79,14 +82,18 @@ module.exports = {
 
 function quantityIncreasing (productsQuantity){
     for(i=0;i<productsQuantity.length;i++){     
-         connection.get().collection(collection.PRODUCT_COLLECTION).updateOne({
+         return new Promise((resolve, reject) => {
+          connection.get().collection(collection.PRODUCT_COLLECTION).updateOne({
             _id : ObjectID(productsQuantity[i].item)
         },
         {
             $inc : {quantity :  productsQuantity[i].quantity}
         }).then((data)=>{
             resolve(data)
+        }).catch((err) => {
+          reject(err)
         })
+         })
     }
     }
   
